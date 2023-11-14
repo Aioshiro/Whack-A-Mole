@@ -65,16 +65,25 @@ namespace WhackAMole.GameObjects
 
 			//Lines.AddAxis(hammerCenterPose.Pose, 0.5f, 0.01f);
 
-			Ray worldSpaceRay = new Ray(hammerCenterPose * (-Vec3.Right*0.15f), (hammerCenterPose * Vec3.Right - hammerCenterPose * (-Vec3.Right))*0.15f); //Go through the hammer head
+			float raySize = 0.03f;
 
-			//Lines.Add(worldSpaceRay, 1, Color.LAB(0,1,1),0.01f);
+			Ray worldSpaceRayCenter = new Ray(hammerCenterPose * (-Vec3.Right*0.15f), (hammerCenterPose * Vec3.Right - hammerCenterPose * (-Vec3.Right))*0.15f); //Go through the hammer head
+
+			Ray worldSpaceRayUp = new Ray(worldSpaceRayCenter.position + (hammerCenterPose * Vec3.Up) * raySize, worldSpaceRayCenter.direction);
+			Ray worldSpaceRayDown = new Ray(worldSpaceRayCenter.position + (hammerCenterPose * Vec3.Up) * -raySize, worldSpaceRayCenter.direction);
+
+
+			Ray worldSpaceRayLeft = new Ray(worldSpaceRayCenter.position + (hammerCenterPose * Vec3.Forward) * -raySize, worldSpaceRayCenter.direction);
+			Ray worldSpaceRayRight = new Ray(worldSpaceRayCenter.position + (hammerCenterPose * Vec3.Forward) * raySize, worldSpaceRayCenter.direction);
 
 
 
 
 			foreach (Mole mole in moles)
 			{
-				mole.CheckIntersection(worldSpaceRay, out Vec3 _);
+
+				mole.CheckIntersection(new Ray[]{ worldSpaceRayCenter ,worldSpaceRayDown,worldSpaceRayLeft,worldSpaceRayRight,worldSpaceRayUp},out Vec3[] _);
+
 			}
 		}
 	}

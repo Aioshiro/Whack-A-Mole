@@ -86,20 +86,32 @@ namespace WhackAMole.GameObjects
 			Bounds bounds = Mesh.Cube.Bounds;
 			Ray localSpaceRay = (Matrix.S(Vec3.One * 0.1f) * currentTransform).Inverse.Transform(worldSpaceRay);
 			bool hasHit = bounds.Intersect(localSpaceRay, out at);
-			if (hasHit)
+			return hasHit;
+		}
+
+		public bool CheckIntersection(Ray[] rays, out Vec3[] at)
+		{
+			at = new Vec3[rays.Length];
+			bool wasItByOne = false;
+			for(int i=0;i<rays.Length; i++)
+			{
+				wasItByOne = wasItByOne || CheckIntersection(rays[i], out at[i]);
+			}
+			if (wasItByOne)
 			{
 				OnHitByHammer();
 			}
 			else
 			{
-				MoleMaterial[MatParamName.ColorTint]= new Color(1, 0, 0, 1);
+				MoleMaterial[MatParamName.ColorTint] = new Color(1, 0, 0, 1);
 			}
-			return hasHit;
+			return wasItByOne;
 		}
 
 		private void OnHitByHammer()
 		{
-			MoleMaterial[MatParamName.ColorTint]= new Color(0, 1, 0, 1);
+			MoleMaterial[MatParamName.ColorTint] = new Color(0, 1, 0, 1);
+
 		}
 	}
 }
