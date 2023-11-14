@@ -6,6 +6,8 @@ namespace WhackAMole.GameObjects
 {
 	internal class Hammer : IDrawable
 	{
+
+		
 		public bool Enabled => true;
 
 		public Model Model { get => _model; set => _model=value; }
@@ -16,7 +18,7 @@ namespace WhackAMole.GameObjects
 		private Model _model;
 		private Material _material;
 
-		private Pose hammerCenteObjectSpace = new Pose(Vec3.Up*0.2f);
+		private Pose hammerCenterObjectSpace = new Pose(Vec3.Up*0.28f);
 		private Pose _pose;
 
 		public Mole[] moles;
@@ -59,17 +61,20 @@ namespace WhackAMole.GameObjects
 
 		private void CheckIfHitting()
 		{
-			Pose hammerCenterPose=(hammerCenteObjectSpace.ToMatrix() * _pose.ToMatrix()).Pose;
+			var hammerCenterPose=(hammerCenterObjectSpace.ToMatrix()* _pose.ToMatrix());
 
-			Lines.AddAxis(hammerCenterPose, 0.05f, 0.01f);
+			//Lines.AddAxis(hammerCenterPose.Pose, 0.5f, 0.01f);
 
-			Ray worldSpaceRayLeft = new Ray(hammerCenterPose.position, hammerCenterPose.position + hammerCenterPose.ToMatrix() * Vec3.Right * 0.15f - hammerCenterPose.position);
+			Ray worldSpaceRay = new Ray(hammerCenterPose * (-Vec3.Right*0.15f), (hammerCenterPose * Vec3.Right - hammerCenterPose * (-Vec3.Right))*0.15f); //Go through the hammer head
 
-			Lines.Add(worldSpaceRayLeft, 1, Color.LAB(0,1,1),0.01f);
+			//Lines.Add(worldSpaceRay, 1, Color.LAB(0,1,1),0.01f);
 
-			foreach(Mole mole in moles)
+
+
+
+			foreach (Mole mole in moles)
 			{
-				mole.CheckIntersection(worldSpaceRayLeft, out Vec3 _);
+				mole.CheckIntersection(worldSpaceRay, out Vec3 _);
 			}
 		}
 	}

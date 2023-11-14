@@ -27,16 +27,18 @@ namespace WhackAMole.GameObjects
 		public Mole(Matrix Matrix)
 		{
 			MoleMaterial = Material.Default.Copy();
-			MoleMaterial.SetColor("color", Color.HSV(40/100, 70/100, 80/100));
+			MoleMaterial.SetColor("color", Color.HSV(0, 1, 1, 1));
 			this.initialTransform = Matrix;
 			currentTransform = initialTransform;
 			SK.AddStepper(this);
 		}
 
-		public bool Enabled => true;
+		public bool Enabled { get => _Enabled; set => _Enabled = value; }
+		private bool _Enabled = true;
 
 		public bool Initialize()
 		{
+			_Enabled = true;
 			return true;
 		}
 
@@ -82,22 +84,22 @@ namespace WhackAMole.GameObjects
 		public bool CheckIntersection(Ray worldSpaceRay,out Vec3 at)
 		{
 			Bounds bounds = Mesh.Cube.Bounds;
-			bounds.Scale(0.1f);
-			bool hasHit = bounds.Intersect(worldSpaceRay, out at);
+			Ray localSpaceRay = (Matrix.S(Vec3.One * 0.1f) * currentTransform).Inverse.Transform(worldSpaceRay);
+			bool hasHit = bounds.Intersect(localSpaceRay, out at);
 			if (hasHit)
 			{
 				OnHitByHammer();
 			}
 			else
 			{
-				Console.WriteLine("not hit !");
+				MoleMaterial[MatParamName.ColorTint]= new Color(1, 0, 0, 1);
 			}
 			return hasHit;
 		}
 
 		private void OnHitByHammer()
 		{
-			Console.WriteLine("hit by hammer !");
+			MoleMaterial[MatParamName.ColorTint]= new Color(0, 1, 0, 1);
 		}
 	}
 }
